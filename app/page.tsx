@@ -37,7 +37,7 @@ export default function HomePage() {
           <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 py-20 text-center md:py-32">
             <div className="relative h-48 w-48 md:h-56 md:w-56">
               <Image
-                src="/hero-capsule.jpg"
+                src="https://i.postimg.cc/Vv3FM8Wp/Chat-GPT-Image-Feb-10-2026-10-30-29-PM.png"
                 alt="A glowing digital time capsule"
                 fill
                 className="rounded-full object-cover shadow-lg"
