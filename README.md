@@ -1,2 +1,0 @@
-# v0-1-o0F7dq9FDj5JOVAR2kmEZGXV-QYsR5didQI1
-v0 chat QYsR5didQI1
