@@ -22,7 +22,7 @@ export function Navbar() {
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-2 md:px-6">
         <Link href="/" className="flex items-center gap-2 text-foreground">
           <Image
-            src="/vitap-logo.png"
+            src="https://i.postimg.cc/cCtZ1kyL/vitap-logo1.png"
             alt="Vitap Logo"
             width={32}
             height={32}
