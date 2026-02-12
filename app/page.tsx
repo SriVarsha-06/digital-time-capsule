@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
 import { Lock, Unlock, Timer, PenLine } from "lucide-react"
 
 const features = [
@@ -124,11 +125,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-card">
-        <div className="mx-auto max-w-5xl px-4 py-6 text-center text-sm text-muted-foreground">
-          Digital Time Capsule
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

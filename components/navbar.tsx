@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -18,9 +19,16 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 md:px-6">
+      <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-2 md:px-6">
         <Link href="/" className="flex items-center gap-2 text-foreground">
-          <Clock className="h-6 w-6 text-primary" />
+          <Image
+            src="/vitap-logo.png"
+            alt="Vitap Logo"
+            width={32}
+            height={32}
+            className="h-8 w-auto"
+            priority
+          />
           <span className="text-lg font-bold tracking-tight">TimeCapsule</span>
         </Link>
 
