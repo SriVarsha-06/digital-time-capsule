@@ -2,10 +2,11 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
-import { Clock, Menu, X } from "lucide-react"
+import { Clock, Menu, X, LogOut } from "lucide-react"
+import { removeToken, getToken } from "@/lib/auth"
 
 const links = [
   { href: "/", label: "Home" },
@@ -15,7 +16,22 @@ const links = [
 
 export function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    setIsAuthenticated(!!getToken())
+  }, [])
+
+  const handleLogout = () => {
+    removeToken()
+    setIsAuthenticated(false)
+    router.push("/login")
+    setOpen(false)
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
@@ -51,6 +67,36 @@ export function Navbar() {
           ))}
         </ul>
 
+        {/* Auth Links */}
+        {mounted && (
+          <div className="hidden items-center gap-2 md:flex">
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Mobile toggle */}
         <button
           type="button"
@@ -83,6 +129,36 @@ export function Navbar() {
               </li>
             ))}
           </ul>
+          {mounted && (
+            <div className="border-t border-border pt-2">
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2 rounded-lg px-4 py-2.5 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
     </header>
