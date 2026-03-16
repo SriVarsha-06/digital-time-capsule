@@ -1,55 +1,97 @@
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://time-capsule-backend-production.up.railway.app"
+
+function getToken(): string {
+  if (typeof window === "undefined") return ""
+  return localStorage.getItem("token") || ""
+}
+
 export interface Capsule {
   id: string
   title: string
   message: string
   createdAt: string
   openDate: string
+  unlockDate: string
   imageUrl?: string
 }
 
-const STORAGE_KEY = "digital-time-capsules"
-
-function getCapsules(): Capsule[] {
-  if (typeof window === "undefined") return []
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
+export async function getAllCapsules(): Promise<Capsule[]> {
+  const res = await fetch(`${API_URL}/api/capsules`, {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  })
+  if (!res.ok) return []
+  return res.json()
 }
 
-function saveCapsules(capsules: Capsule[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(capsules))
+export async function getCapsuleById(id: string): Promise<Capsule | undefined> {
+  const res = await fetch(`${API_URL}/api/capsules/${id}`, {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  })
+  if (!res.ok) return undefined
+  return res.json()
 }
 
-export function getAllCapsules(): Capsule[] {
-  return getCapsules().sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
+export async function createCapsule(data: {
+  title: string
+  message: string
+  unlockDate: string
+  imageUrl?: string
+}): Promise<Capsule> {
+  const res = await fetch(`${API_URL}/api/capsules`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify(data),
+  })
+  return res.json()
 }
 
-export function getCapsuleById(id: string): Capsule | undefined {
-  return getCapsules().find((c) => c.id === id)
-}
-
-export function createCapsule(data: Omit<Capsule, "id" | "createdAt">): Capsule {
-  const capsule: Capsule = {
-    ...data,
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
-  }
-  const all = getCapsules()
-  all.push(capsule)
-  saveCapsules(all)
-  return capsule
-}
-
-export function deleteCapsule(id: string) {
-  const all = getCapsules().filter((c) => c.id !== id)
-  saveCapsules(all)
+export async function deleteCapsule(id: string): Promise<void> {
+  await fetch(`${API_URL}/api/capsules/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${getToken()}` },
+  })
 }
 
 export function isUnlocked(capsule: Capsule): boolean {
-  return new Date() >= new Date(capsule.openDate)
+  const date = capsule.unlockDate || capsule.openDate
+  return new Date() >= new Date(date)
+}
+
+export async function login(email: string, password: string) {
+  const res = await fetch(`${API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || "Login failed")
+  localStorage.setItem("token", data.token)
+  localStorage.setItem("user", JSON.stringify(data.user))
+  return data
+}
+
+export async function register(name: string, email: string, password: string) {
+  const res = await fetch(`${API_URL}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || "Register failed")
+  localStorage.setItem("token", data.token)
+  localStorage.setItem("user", JSON.stringify(data.user))
+  return data
+}
+
+export function logout() {
+  localStorage.removeItem("token")
+  localStorage.removeItem("user")
+}
+
+export function isLoggedIn(): boolean {
+  if (typeof window === "undefined") return false
+  return !!localStorage.getItem("token")
 }
