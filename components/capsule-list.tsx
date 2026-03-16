@@ -2,24 +2,35 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { getAllCapsules, isUnlocked, deleteCapsule, type Capsule } from "@/lib/capsules"
+import { useRouter } from "next/navigation"
+import { getAllCapsules, isUnlocked, deleteCapsule, isLoggedIn, type Capsule } from "@/lib/capsules"
 import { Lock, Unlock, Trash2, Eye, Plus } from "lucide-react"
 
 export function CapsuleList() {
   const [capsules, setCapsules] = useState<Capsule[]>([])
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
-    setCapsules(getAllCapsules())
+    if (!isLoggedIn()) {
+      router.push("/login")
+      return
+    }
+    getAllCapsules().then((data) => {
+      setCapsules(data)
+      setLoading(false)
+    })
   }, [])
 
-  function handleDelete(id: string) {
-    deleteCapsule(id)
-    setCapsules(getAllCapsules())
+  async function handleDelete(id: string) {
+    await deleteCapsule(id)
+    const updated = await getAllCapsules()
+    setCapsules(updated)
   }
 
-  if (!mounted) {
+  if (!mounted || loading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -54,7 +65,7 @@ export function CapsuleList() {
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {capsules.map((capsule) => {
         const unlocked = isUnlocked(capsule)
-        const openDate = new Date(capsule.openDate)
+        const openDate = new Date(capsule.unlockDate || capsule.openDate)
 
         return (
           <div
