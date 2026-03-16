@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { createCapsule } from "@/lib/capsules"
@@ -15,6 +14,7 @@ export function CreateCapsuleForm() {
   const [openDate, setOpenDate] = useState("")
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
   const today = new Date()
   today.setDate(today.getDate() + 1)
@@ -30,7 +30,7 @@ export function CreateCapsuleForm() {
     reader.readAsDataURL(file)
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
 
@@ -47,14 +47,20 @@ export function CreateCapsuleForm() {
       return
     }
 
-    createCapsule({
-      title: title.trim(),
-      message: message.trim(),
-      openDate: new Date(openDate).toISOString(),
-      imageUrl: imagePreview ?? undefined,
-    })
-
-    router.push("/capsules")
+    setLoading(true)
+    try {
+      await createCapsule({
+        title: title.trim(),
+        message: message.trim(),
+        unlockDate: openDate,
+        imageUrl: imagePreview ?? undefined,
+      })
+      router.push("/capsules")
+    } catch (err) {
+      setError("Failed to create capsule. Please try again.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -113,7 +119,7 @@ export function CreateCapsuleForm() {
         </p>
       </div>
 
-      {/* Image Upload (UI only) */}
+      {/* Image Upload */}
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium text-foreground">
           Attach an Image <span className="text-muted-foreground">(optional)</span>
@@ -159,10 +165,11 @@ export function CreateCapsuleForm() {
       {/* Submit */}
       <button
         type="submit"
-        className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+        disabled={loading}
+        className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-50"
       >
         <Send className="h-4 w-4" />
-        Seal Capsule
+        {loading ? "Sealing..." : "Seal Capsule"}
       </button>
     </form>
   )
