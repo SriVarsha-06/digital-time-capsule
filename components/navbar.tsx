@@ -2,10 +2,11 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
-import { Clock, Menu, X } from "lucide-react"
+import { Menu, X, LogOut } from "lucide-react"
+import { logout, isLoggedIn } from "@/lib/capsules"
 
 const links = [
   { href: "/", label: "Home" },
@@ -15,7 +16,19 @@ const links = [
 
 export function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
+
+  useEffect(() => {
+    setLoggedIn(isLoggedIn())
+  }, [pathname])
+
+  function handleLogout() {
+    logout()
+    setLoggedIn(false)
+    router.push("/login")
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
@@ -49,6 +62,18 @@ export function Navbar() {
               </Link>
             </li>
           ))}
+          {loggedIn && (
+            <li>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </li>
+          )}
         </ul>
 
         {/* Mobile toggle */}
@@ -82,6 +107,18 @@ export function Navbar() {
                 </Link>
               </li>
             ))}
+            {loggedIn && (
+              <li>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex w-full items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       )}
