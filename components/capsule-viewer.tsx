@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { getCapsuleById, isUnlocked, isLoggedIn, type Capsule } from "@/lib/capsules"
+import { getAllCapsules, isUnlocked, isLoggedIn, type Capsule } from "@/lib/capsules"
 import { CountdownTimer } from "@/components/countdown-timer"
 import { Lock, Unlock, ArrowLeft, CalendarDays } from "lucide-react"
 
@@ -21,7 +21,8 @@ export function CapsuleViewer() {
       return
     }
     const id = params.id as string
-    getCapsuleById(id).then((found) => {
+    getAllCapsules().then((capsules) => {
+      const found = capsules.find((c) => c.id === id)
       if (!found) {
         router.push("/capsules")
         return
