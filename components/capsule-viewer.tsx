@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { getCapsuleById, isUnlocked, type Capsule } from "@/lib/capsules"
+import { getCapsuleById, isUnlocked, isLoggedIn, type Capsule } from "@/lib/capsules"
 import { CountdownTimer } from "@/components/countdown-timer"
 import { Lock, Unlock, ArrowLeft, CalendarDays } from "lucide-react"
 
@@ -12,19 +12,26 @@ export function CapsuleViewer() {
   const router = useRouter()
   const [capsule, setCapsule] = useState<Capsule | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setMounted(true)
-    const id = params.id as string
-    const found = getCapsuleById(id)
-    if (!found) {
-      router.push("/capsules")
+    if (!isLoggedIn()) {
+      router.push("/login")
       return
     }
-    setCapsule(found)
+    const id = params.id as string
+    getCapsuleById(id).then((found) => {
+      if (!found) {
+        router.push("/capsules")
+        return
+      }
+      setCapsule(found)
+      setLoading(false)
+    })
   }, [params.id, router])
 
-  if (!mounted || !capsule) {
+  if (!mounted || loading || !capsule) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -33,7 +40,7 @@ export function CapsuleViewer() {
   }
 
   const unlocked = isUnlocked(capsule)
-  const openDate = new Date(capsule.openDate)
+  const openDate = new Date(capsule.unlockDate || capsule.openDate)
   const createdDate = new Date(capsule.createdAt)
 
   return (
@@ -120,7 +127,7 @@ export function CapsuleViewer() {
                   Your message will be revealed when the countdown reaches zero.
                 </p>
               </div>
-              <CountdownTimer targetDate={capsule.openDate} />
+              <CountdownTimer targetDate={capsule.unlockDate || capsule.openDate} />
             </div>
           )}
         </div>
