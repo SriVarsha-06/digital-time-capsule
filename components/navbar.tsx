@@ -62,7 +62,7 @@ export function Navbar() {
               </Link>
             </li>
           ))}
-          {loggedIn && (
+          {loggedIn ? (
             <li>
               <button
                 type="button"
@@ -73,6 +73,25 @@ export function Navbar() {
                 Logout
               </button>
             </li>
+          ) : (
+            <>
+              <li>
+                <Link
+                  href="/login"
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                >
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/login"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  Register
+                </Link>
+              </li>
+            </>
           )}
         </ul>
 
@@ -107,7 +126,7 @@ export function Navbar() {
                 </Link>
               </li>
             ))}
-            {loggedIn && (
+            {loggedIn ? (
               <li>
                 <button
                   type="button"
@@ -118,6 +137,27 @@ export function Navbar() {
                   Logout
                 </button>
               </li>
+            ) : (
+              <>
+                <li>
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                  >
+                    Login
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
+                    Register
+                  </Link>
+                </li>
+              </>
             )}
           </ul>
         </div>
