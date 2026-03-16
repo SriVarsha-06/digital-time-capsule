@@ -1,9 +1,9 @@
 "use client"
 
 import React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { createCapsule } from "@/lib/capsules"
+import { createCapsule, isLoggedIn } from "@/lib/capsules"
 import { ImagePlus, X, Send } from "lucide-react"
 
 export function CreateCapsuleForm() {
@@ -15,6 +15,12 @@ export function CreateCapsuleForm() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!isLoggedIn()) {
+      router.push("/login")
+    }
+  }, [])
 
   const today = new Date()
   today.setDate(today.getDate() + 1)
