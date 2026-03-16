@@ -15,12 +15,33 @@ export interface Capsule {
   imageUrl?: string
 }
 
+function fixDates(capsule: any): Capsule {
+  return {
+    ...capsule,
+    unlockDate: capsule.unlockDate
+      ? typeof capsule.unlockDate === "object"
+        ? `${capsule.unlockDate.year}-${String(capsule.unlockDate.month).padStart(2, "0")}-${String(capsule.unlockDate.day).padStart(2, "0")}`
+        : capsule.unlockDate
+      : capsule.openDate,
+    createdAt: capsule.createdAt
+      ? typeof capsule.createdAt === "object"
+        ? new Date(
+            capsule.createdAt.year,
+            capsule.createdAt.month - 1,
+            capsule.createdAt.day
+          ).toISOString()
+        : capsule.createdAt
+      : new Date().toISOString(),
+  }
+}
+
 export async function getAllCapsules(): Promise<Capsule[]> {
   const res = await fetch(`${API_URL}/api/capsules`, {
     headers: { Authorization: `Bearer ${getToken()}` },
   })
   if (!res.ok) return []
-  return res.json()
+  const data = await res.json()
+  return data.map(fixDates)
 }
 
 export async function getCapsuleById(id: string): Promise<Capsule | undefined> {
