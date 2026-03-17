@@ -85,7 +85,7 @@ export function Navbar() {
               </li>
               <li>
                 <Link
-                  href="/login"
+                  href="/register"
                   className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   Register
@@ -150,7 +150,7 @@ export function Navbar() {
                 </li>
                 <li>
                   <Link
-                    href="/login"
+                    href="/register"
                     onClick={() => setOpen(false)}
                     className="block rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                   >
