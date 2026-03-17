@@ -23,7 +23,7 @@ function extractValue(val: any): number {
 function fixDates(capsule: any): Capsule {
   const unlockDate = capsule.unlockDate
     ? typeof capsule.unlockDate === "object" && "year" in capsule.unlockDate
-      ? `${extractValue(capsule.unlockDate.year)}-${String(extractValue(capsule.unlockDate.month)).padStart(2, "0")}-${String(extractValue(capsule.unlockDate.day)).padStart(2, "0")}`
+     ? `${extractValue(capsule.unlockDate.year)}-${String(extractValue(capsule.unlockDate.month)).padStart(2, "0")}-${String(extractValue(capsule.unlockDate.day)).padStart(2, "0")}T00:00:00`
       : capsule.unlockDate
     : capsule.openDate
 
