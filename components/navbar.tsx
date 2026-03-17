@@ -27,7 +27,7 @@ export function Navbar() {
   function handleLogout() {
     logout()
     setLoggedIn(false)
-    router.push("/login")
+    router.push("/")
   }
 
   return (
