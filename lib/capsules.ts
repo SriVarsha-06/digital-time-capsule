@@ -15,23 +15,32 @@ export interface Capsule {
   imageUrl?: string
 }
 
+function extractValue(val: any): number {
+  if (typeof val === "object" && val !== null && "low" in val) return val.low
+  return val
+}
+
 function fixDates(capsule: any): Capsule {
+  const unlockDate = capsule.unlockDate
+    ? typeof capsule.unlockDate === "object" && "year" in capsule.unlockDate
+      ? `${extractValue(capsule.unlockDate.year)}-${String(extractValue(capsule.unlockDate.month)).padStart(2, "0")}-${String(extractValue(capsule.unlockDate.day)).padStart(2, "0")}`
+      : capsule.unlockDate
+    : capsule.openDate
+
+  const createdAt = capsule.createdAt
+    ? typeof capsule.createdAt === "object" && "year" in capsule.createdAt
+      ? new Date(
+          extractValue(capsule.createdAt.year),
+          extractValue(capsule.createdAt.month) - 1,
+          extractValue(capsule.createdAt.day)
+        ).toISOString()
+      : capsule.createdAt
+    : new Date().toISOString()
+
   return {
     ...capsule,
-    unlockDate: capsule.unlockDate
-      ? typeof capsule.unlockDate === "object"
-        ? `${capsule.unlockDate.year}-${String(capsule.unlockDate.month).padStart(2, "0")}-${String(capsule.unlockDate.day).padStart(2, "0")}`
-        : capsule.unlockDate
-      : capsule.openDate,
-    createdAt: capsule.createdAt
-      ? typeof capsule.createdAt === "object"
-        ? new Date(
-            capsule.createdAt.year,
-            capsule.createdAt.month - 1,
-            capsule.createdAt.day
-          ).toISOString()
-        : capsule.createdAt
-      : new Date().toISOString(),
+    unlockDate,
+    createdAt,
   }
 }
 
